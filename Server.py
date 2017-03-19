@@ -2,6 +2,7 @@ import socket
 import cv2
 import commands
 import numpy as np
+import zlib
 
 def get_port():
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -26,7 +27,11 @@ def main():
 	tcp_sock.listen(port)
 
 	conn, addr = tcp_sock.accept()
-	buf = int(conn.recv(1024))
+	try:
+		buf = int(conn.recv(1024))
+	except ValueError:
+		pass
+	
 
 	f_name = conn.getpeername()[0]+".avi"
 
@@ -37,6 +42,7 @@ def main():
 
 		data, addr = udp_sock.recvfrom(1024*buf)
 		
+		data = zlib.decompress(data)
 		nparr = np.fromstring(data, np.uint8)
 		frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 		
