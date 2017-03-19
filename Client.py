@@ -3,6 +3,7 @@ import cv
 import cv2
 import sys
 import numpy as np
+import zlib
 
 def main():
 
@@ -24,7 +25,7 @@ def main():
 		
 		buf = cv2.imencode('.jpg', frame)[1].tostring()
 		message = str(sys.getsizeof(buf))
-		
+		buf = zlib.compress(buf, 9)
 		try:
 			tcp_sock.send(message)
 			udp_sock.sendto(buf, (ip, port))
